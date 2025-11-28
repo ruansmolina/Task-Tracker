@@ -14,31 +14,35 @@ public class JsonTaskMapper {
 
 
     public static String convertTaskToJson(Task task){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         String result ="{\"id\":\"%d\",\"status\":\"%s\",\"description\":\"%s\",\"createdAt\":\"%s\",\"updatedAt\":\"%s\"}";
         return String.format(result,task.getId(),
-                task.getStatus().toString(),
+                task.getStatus(),
                 task.getDescription(),
-                task.getCreatedAt().toString(),
-                task.getUpdatedAt().toString());
+                task.getCreatedAt().format(formatter),
+                task.getUpdatedAt().format(formatter));
     }
     public static Task convertJsonToTask(String json){
-        String[] result = json.replaceAll("\"","").split(",");
-        String[] spl = null;
+        String[] result = json.replaceAll("\"","").replace("}","").split(",");
         String desc = null;
         Integer id = null;
         LocalDateTime created = null;
         LocalDateTime updated = null;
         Status status = null;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        String key,value;
+        int splitI;
 
         for(String r : result){
-            spl = r.split(":");
-            switch(spl[0]){
-                case "id"-> id =Integer.parseInt(spl[1]);
-                case "description" -> desc = spl[1];
-                case "updatedAt"-> updated = LocalDateTime.parse(spl[1],formatter);
-                case "createdAt"-> created = LocalDateTime.parse(spl[1],formatter);
-                case "status" -> status = Status.valueOf(spl[1]);
+            splitI =r.indexOf(":");
+            key = r.substring(0,splitI);
+            value = r.substring(splitI+1);
+            switch(key){
+                case "id"-> id =Integer.parseInt(value);
+                case "description" -> desc = value;
+                case "updatedAt"-> updated = LocalDateTime.parse(value,formatter);
+                case "createdAt"-> created = LocalDateTime.parse(value,formatter);
+                case "status" -> status = Status.valueOf(value);
             }
 
         }
@@ -52,7 +56,7 @@ public class JsonTaskMapper {
         }
 
         String[] results = json.split("\"tasks\":");
-        Task.latestId = Integer.parseInt(String.valueOf(results[0].charAt(results[0].indexOf(':')+1)));
+        Task.latestId = Integer.valueOf(results[0].substring(results[0].indexOf(':')+1,results[0].indexOf(',')));
         var result = json.substring(json.indexOf('[') +1,json.indexOf(']')).replaceAll("\\{","")
                 .replaceAll("\n","").split("},");
 
