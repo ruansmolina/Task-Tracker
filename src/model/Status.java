@@ -5,6 +5,12 @@ public enum Status {
     IN_PROGRESS("in-progress"),
     DONE("done");
 
-    Status(String status) {
+    private final String description;
+    Status(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

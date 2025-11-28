@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Task {
     public static Integer latestId = 0;
-    private Integer id;
+    private final Integer id;
     private String description;
     private Status status;
     private final LocalDateTime createdAt;
@@ -12,7 +12,6 @@ public class Task {
 
 
     public Task(String description) {
-        verifyDescription(description);
         this.updatedAt = LocalDateTime.now();
         this.createdAt = LocalDateTime.now();
         this.status = Status.TO_DO;
@@ -21,7 +20,6 @@ public class Task {
     }
 
     public Task(LocalDateTime updatedAt, Integer id, String description, Status status, LocalDateTime createdAt) {
-        verifyDescription(description);
         this.updatedAt = updatedAt;
         this.id = id;
         this.description = description;
@@ -56,7 +54,6 @@ public class Task {
         this.status = status;
     }
     public void setDescription(String desc){
-        verifyDescription(desc);
         this.description = desc;
         setUpdatedAt();
     }
@@ -70,10 +67,5 @@ public class Task {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
-    }
-    public void verifyDescription(String description){
-        if(description==null || description.isBlank()){
-            throw  new IllegalArgumentException("description can't be empty");
-        }
     }
 }
