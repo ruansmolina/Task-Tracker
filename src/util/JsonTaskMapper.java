@@ -15,15 +15,16 @@ public class JsonTaskMapper {
 
     public static String convertTaskToJson(Task task){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        String result ="{\"id\":\"%d\",\"status\":\"%s\",\"description\":\"%s\",\"createdAt\":\"%s\",\"updatedAt\":\"%s\"}";
-        return String.format(result,task.getId(),
+        String taskFormatter ="{\"id\":\"%d\",\"status\":\"%s\",\"description\":\"%s\",\"createdAt\":\"%s\",\"updatedAt\":\"%s\"}";
+        return String.format(taskFormatter,
+                task.getId(),
                 task.getStatus(),
                 task.getDescription(),
                 task.getCreatedAt().format(formatter),
                 task.getUpdatedAt().format(formatter));
     }
     public static Task convertJsonToTask(String json){
-        String[] result = json.replaceAll("\"","").replace("}","").split(",");
+        String[] rawTask = json.replaceAll("\"","").replace("}","").split(",");
         String desc = null;
         Integer id = null;
         LocalDateTime created = null;
@@ -33,7 +34,7 @@ public class JsonTaskMapper {
         String key,value;
         int splitI;
 
-        for(String r : result){
+        for(String r : rawTask){
             splitI =r.indexOf(":");
             key = r.substring(0,splitI);
             value = r.substring(splitI+1);
@@ -49,20 +50,22 @@ public class JsonTaskMapper {
         return new Task(updated,id,desc,status,created);
     };
     public static List<Task> convertJsonToTasks(String json){
-
         List<Task> list = new ArrayList<>();
         if(json.isBlank()){
             return list;
         }
 
-        String[] results = json.split("\"tasks\":");
-        Task.latestId = Integer.valueOf(results[0].substring(results[0].indexOf(':')+1,results[0].indexOf(',')));
-        var result = json.substring(json.indexOf('[') +1,json.indexOf(']')).replaceAll("\\{","")
+        int latestStart = json.indexOf("\"latestId\"") + "\"latestId\":".length();
+        int latestEnd = json.indexOf(",", latestStart);
+        Task.latestId = Integer.valueOf(json.substring(latestStart, latestEnd).trim());
+
+        int tasksStart = json.indexOf("\"tasks\"") + "\"tasks\":".length();
+        int tasksEnd = json.lastIndexOf("]") + 1;
+        String rawTasks = json.substring(tasksStart, tasksEnd).trim();
+        String[] tasks = rawTasks.replace("[","").replace("]","").replaceAll("\\{","")
                 .replaceAll("\n","").split("},");
-
-
-        for (String s: result){
-            list.add(convertJsonToTask(s));
+        for (String task: tasks){
+            list.add(convertJsonToTask(task));
         }
         return list ;
     }
@@ -72,7 +75,6 @@ public class JsonTaskMapper {
         }
         StringBuilder sb = new StringBuilder("{\"latestId\":").append(Task.latestId).append(",\n");
         sb.append("\"tasks\":[\n");
-//        tasks.forEach((r)->sb.append(convertTaskToJson(r)).append(',').append('\n'));
         for (int i = 0; i < tasks.size(); i++) {
             sb.append(convertTaskToJson(tasks.get(i)));
             if(i < tasks.size() - 1){
