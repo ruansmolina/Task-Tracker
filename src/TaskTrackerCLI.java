@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
-public class Application {
+public class TaskTrackerCLI {
 
     private static final String PATH = "tasks.json";
 
@@ -102,6 +102,11 @@ public class Application {
                 printList(list);
                 break;
             }
+            default:{
+                System.err.println("Command invalid.");
+                break;
+
+            }
         }
 
         taskService.finish();
@@ -112,7 +117,7 @@ public class Application {
         try{
             value = Integer.parseInt(id);
         }catch (NumberFormatException  e){
-            System.err.printf("Invalid ID format, only numbers: [%s]", id);
+            System.err.printf("Invalid ID format: [%s], Only numbers are accepted.", id);
         }
         return value;
     }
