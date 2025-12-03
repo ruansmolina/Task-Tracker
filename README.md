@@ -11,29 +11,31 @@ Challenge from [roadmap.sh](https://roadmap.sh/projects/task-tracker).
 
 1. **Clone the repository:**
 
-   ```bash
-   git clone https://github.com/ruansmolina/Task-Tracker.git
-   cd Task-Tracker
-   ```
+```bash
+git clone https://github.com/ruansmolina/Task-Tracker.git
+cd Task-Tracker
+```
 
 
 2. **Compile the source code:**
-    ```bash
-    dir /s /B *.java > sources.txt
-    javac -d output_dir @sources.txt
-   ```
+```bash
+dir /s /B *.java > sources.txt
+javac -d output_dir @sources.txt
+```
 
 **OR**
+
 ```bash
 cd src
 javac -d output_dir *.java
 ```
 
+
 3. **Run the application:**
-    ```bash
-   cd output_dir
-   java TaskTrackerCLI --help
-   ```
+```bash
+cd output_dir
+java TaskTrackerCLI --help
+```
 
 # Usage
 1. **Adding a new task:**
@@ -51,7 +53,7 @@ java TaskTrackerCLI update 1 "Buy groceries and cook dinner"
 java TaskTrackerCLI delete 1
 # Output: Task deleted successfully 
 ```
-4. **Marking a task as in "progress" or "done":**
+4. **Marking a task as in 'progress' or 'done':**
 ```bash 
 java TaskTrackerCLI mark-in-progress 1
 java TaskTrackerCLI mark-done 1
@@ -71,5 +73,4 @@ java TaskTrackerCLI list
 java TaskTrackerCLI list done
 java TaskTrackerCLI list todo
 java TaskTrackerCLI list in-progress
-```
 
