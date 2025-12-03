@@ -14,15 +14,17 @@ public class TaskTrackerCLI {
 
     public static void main(String[] args) throws IOException {
 
-
+        String help = """
+                Usage:                      <command> [arguments...]
+                * Add a new task            - add "description"
+                * Update a task             - update ID "new description"
+                * Delete a task             - delete ID
+                * Mark task as in-progress  - mark-in-progress ID
+                * Mark task as done         - mark-done ID
+                * List task by status       - list [todo, in-progress, done]
+                """;
         if(args.length< 1){
-            System.out.println("Usage: command arguments ");
-            System.out.println("* Add new task  - add \"description\"");
-            System.out.println("* Update a task - update ID \"new description\"");
-            System.out.println("* Delete a task - delete ID");
-            System.out.println("* Mark in-progress task - mark-in-progress ID ");
-            System.out.println("* Mark done task - mark-done ID");
-            System.out.println("* List task by status - list [all, todo, in-progress, done]");
+            System.out.println(help);
             return;
         }
         var taskService =new TaskService(new TaskRepository(PATH));
@@ -94,18 +96,23 @@ public class TaskTrackerCLI {
                 break;
             }
             case "list":{
-                if (args. length < 2) {
-                    System.err.println("Missing argument [Status] - list [all, todo, in-progress, done]");
+                List<Task> list;
+                try {
+                     list = taskService.getTasksByStatus(args.length < 2 ? "all" : args[1]);
+                }catch (IllegalArgumentException e){
+                    System.err.println("Invalid argument [status] - list [todo, in-progress, done]");
                     break;
                 }
-                var list = taskService.getTasksByStatus(args[1]);
                 printList(list);
                 break;
             }
-            default:{
-                System.err.println("Command invalid.");
+            case "--help":{
+                System.out.println(help);
                 break;
-
+            }
+            default:{
+                System.err.println("Command invalid, use --help");
+                break;
             }
         }
 
@@ -127,8 +134,12 @@ public class TaskTrackerCLI {
         DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         StringBuilder sb =  new StringBuilder(String
                 .format(header,"ID","Description","Status","Created At", "Updated At"));
-        list.forEach((t)-> sb.append(String.format(formatedLine,t.getId(),t.getDescription(),
-        t.getStatus().getDescription(),t.getCreatedAt().format(formatter),t.getUpdatedAt().format(formatter))));
+        list.forEach((t)-> sb.append(String.format(formatedLine,
+                t.getId(),
+                t.getDescription(),
+                t.getStatus().getDescription(),
+                t.getCreatedAt().format(formatter),
+                t.getUpdatedAt().format(formatter))));
         System.out.println(sb.toString());
     }
 

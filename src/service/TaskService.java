@@ -9,18 +9,18 @@ import java.io.IOException;
 import java.util.List;
 
 public class TaskService {
-    private final TaskRepository tr;
+    private final TaskRepository taskRepository;
     private List<Task> tasks;
     public TaskService(TaskRepository repository){
-        this.tr = repository;
+        this.taskRepository = repository;
     }
 
     public void start() throws IOException {
-        tasks = tr.getTasks();
+        tasks = taskRepository.getTasks();
     }
 
     public void finish() throws IOException {
-        tr.saveTasks(this.tasks);
+        taskRepository.saveTasks(this.tasks);
     }
 
     public List<Task> getTasks() {
@@ -45,7 +45,7 @@ public class TaskService {
         return task.getId();
     }
 
-    public Task findById(int id){
+    public Task findById(int id) throws IllegalArgumentException{
         return tasks.stream().filter((t)-> t.getId()==id).findFirst().orElseThrow(()-> new IllegalArgumentException("ID not found."));
     }
 
@@ -64,20 +64,20 @@ public class TaskService {
         var originalTask = findById(id);
         originalTask.setDescription(desc);
         return originalTask.getId();
-
     }
 
     public void removeTask(int id){
         tasks.remove(findById(id));
     }
 
-    public List<Task> getTasksByStatus(String arg) {
+    public List<Task> getTasksByStatus(String arg) throws IllegalArgumentException {
         List<Task> result;
-        switch(arg){
+        switch(arg.toLowerCase()){
             case "todo"-> result = getTasksToDo();
             case "in-progress"->result =  getTasksInProgress();
             case "done"-> result = getTasksDone();
-            default ->  result = getTasks();
+            case "all"->result = getTasks();
+            default -> throw  new IllegalArgumentException();
         }
         return result;
     }
